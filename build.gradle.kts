@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.github.0owoodendooro0"
-version = "1.0.0-SNAPSHOT"
+version = "1.0.0"
 
 application {
     mainClass = "io.ktor.server.netty.EngineMain"
@@ -35,7 +35,7 @@ publishing {
             from(components["java"])
             groupId = "com.github.0owoodendooro0"
             artifactId = "curtly"
-            version = "1.0.0-SNAPSHOT"
+            version = "1.0.0"
         }
     }
 }
