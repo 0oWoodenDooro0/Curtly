@@ -23,12 +23,21 @@ data class ShortenResponse(
 )
 
 val fileStorage = FileUrlStorage(File("data/urls.db"))
-val curtlyService = CurtlyService(
-    storage = fileStorage,
-    baseUrl = "http://localhost:8080"
-)
+lateinit var curtlyService: CurtlyService
+    private set
 
 fun Application.configureRouting() {
+    val configBaseUrl = environment.config.propertyOrNull("curtly.baseUrl")?.getString()
+        ?: System.getenv("CURTLY_BASE_URL")
+        ?: System.getenv("BASE_URL")
+        ?: System.getProperty("curtly.baseUrl")
+        ?: "http://localhost:8080"
+
+    curtlyService = CurtlyService(
+        storage = fileStorage,
+        baseUrl = configBaseUrl
+    )
+
     routing {
         get("/") {
             call.respondText("Curtly URL Shortener is running! Try POSTing to /shorten with a JSON body: {\"url\": \"https://example.com\"}")

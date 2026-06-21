@@ -44,4 +44,61 @@ class ServerTest {
         assertEquals(HttpStatusCode.Found, redirectResponse.status)
         assertEquals("https://github.com", redirectResponse.headers[HttpHeaders.Location])
     }
+
+    @Test
+    fun `test custom baseUrl from config`() = testApplication {
+        System.setProperty("curtly.baseUrl", "https://mycustomdomain.com")
+        try {
+            configure()
+            
+            val testClient = createClient {
+                followRedirects = false
+            }
+            
+            val uniqueKey = "custom-" + UUID.randomUUID().toString().take(6)
+            
+            val shortenResponse = testClient.post("/shorten") {
+                contentType(ContentType.Application.Json)
+                setBody("""{"url":"https://github.com","key":"$uniqueKey"}""")
+            }
+            
+            assertEquals(HttpStatusCode.Created, shortenResponse.status)
+            val responseBody = shortenResponse.bodyAsText()
+            assertTrue(responseBody.contains("https://mycustomdomain.com/$uniqueKey"), "Response body was: $responseBody")
+        } finally {
+            System.clearProperty("curtly.baseUrl")
+        }
+    }
+
+    @Test
+    fun `test custom baseUrl from MapApplicationConfig`() = testApplication {
+        environment {
+            config = io.ktor.server.config.MapApplicationConfig(
+                "curtly.baseUrl" to "https://mycustomdomain2.com"
+            )
+        }
+        application {
+            configureSerialization()
+            configureRouting()
+        }
+
+        
+        val testClient = createClient {
+            followRedirects = false
+        }
+        
+        val uniqueKey = "custom2-" + UUID.randomUUID().toString().take(6)
+        
+        val shortenResponse = testClient.post("/shorten") {
+            contentType(ContentType.Application.Json)
+            setBody("""{"url":"https://github.com","key":"$uniqueKey"}""")
+        }
+        
+        assertEquals(HttpStatusCode.Created, shortenResponse.status)
+        val responseBody = shortenResponse.bodyAsText()
+        assertTrue(responseBody.contains("https://mycustomdomain2.com/$uniqueKey"), "Response body was: $responseBody")
+    }
 }
+
+
+
