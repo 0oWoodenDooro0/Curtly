@@ -6,14 +6,14 @@ plugins {
 }
 
 group = "com.github.0owoodendooro0"
-version = "1.0.1"
+version = "1.0.2"
 
 application {
     mainClass = "io.ktor.server.netty.EngineMain"
 }
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(17)
 }
 dependencies {
     implementation(ktorLibs.server.callLogging)
@@ -35,7 +35,7 @@ publishing {
             from(components["java"])
             groupId = "com.github.0owoodendooro0"
             artifactId = "curtly"
-            version = "1.0.1"
+            version = "1.0.2"
         }
     }
 }
